@@ -1,14 +1,15 @@
-import React, { FC, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import classnames from "classnames";
 import ReactDOM from "react-dom";
 import { X } from "react-feather";
 
 export interface ModalProps {
+  children?: React.ReactNode;
   closeModal: () => void;
   size?: string;
 }
 
-const Modal: FC<ModalProps> = (props) => {
+const Modal: React.FC<ModalProps> = (props) => {
   const [el, setEl] = useState<HTMLDivElement>(document.createElement("div"));
 
   useLayoutEffect(() => {
@@ -26,7 +27,7 @@ const Modal: FC<ModalProps> = (props) => {
 
 export default Modal;
 
-const ModalContainer: FC<ModalProps> = (props) => {
+const ModalContainer: React.FC<ModalProps> = (props) => {
   const { children, closeModal, size } = props;
 
   return (

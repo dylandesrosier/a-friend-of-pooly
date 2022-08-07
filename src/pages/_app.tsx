@@ -1,61 +1,43 @@
 import "../styles/globals.css";
-import type { AppProps } from "next/app";
+import "@rainbow-me/rainbowkit/styles.css";
 
-import { WagmiProvider, chain } from "wagmi";
-import { providers } from "ethers";
+import type { AppProps } from "next/app";
+import { WagmiConfig, createClient, chain, configureChains } from "wagmi";
 import {
   RainbowKitProvider,
-  Chain,
   getDefaultWallets,
-  connectorsForWallets,
   lightTheme,
   darkTheme,
 } from "@rainbow-me/rainbowkit";
+import { infuraProvider } from "wagmi/providers/infura";
+import { publicProvider } from "wagmi/providers/public";
 
-import "@rainbow-me/rainbowkit/styles.css";
+const { chains, provider } = configureChains(
+  [chain.mainnet],
+  [
+    infuraProvider({ infuraId: process.env.NEXT_PUBLIC_INFURA_ID }),
+    publicProvider(),
+  ]
+);
 
-const infuraId = process.env.NEXT_PUBLIC_INFURA_ID;
-
-console.log({ infuraId });
-
-const provider = ({ chainId }: { chainId?: number }) =>
-  new providers.InfuraProvider(chainId, infuraId);
-
-const chains: Chain[] = [
-  { ...chain.mainnet, name: "Ethereum" },
-  { ...chain.polygonMainnet, name: "Polygon" },
-  // { ...chain.optimism, name: "Optimism" },
-  // { ...chain.arbitrumOne, name: "Arbitrum" },
-];
-
-const wallets = getDefaultWallets({
+const { connectors } = getDefaultWallets({
+  appName: "A Friend of Pooly",
   chains,
-  infuraId,
-  appName: "Bonsai3",
-  jsonRpcUrl: ({ chainId }) =>
-    chains.find((x) => x.id === chainId)?.rpcUrls?.[0] ??
-    chain.mainnet.rpcUrls[0],
 });
 
-const connectors = connectorsForWallets(wallets);
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider,
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <RainbowKitProvider
-      chains={chains}
-      theme={{
-        lightMode: lightTheme({
-          accentColor: "blue",
-        }),
-        darkMode: darkTheme({
-          accentColor: "blue",
-        }),
-      }}
-    >
-      <WagmiProvider autoConnect connectors={connectors} provider={provider}>
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider chains={chains}>
         <Component {...pageProps} />
-      </WagmiProvider>
-    </RainbowKitProvider>
+      </RainbowKitProvider>
+    </WagmiConfig>
   );
 }
 

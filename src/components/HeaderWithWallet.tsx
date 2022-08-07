@@ -1,6 +1,7 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import classNames from "classnames";
 
-export const Header: React.FC<{ className?: string }> = (props) => {
+export const HeaderWithWallet: React.FC<{ className?: string }> = (props) => {
   return (
     <div
       className={classNames(
@@ -31,6 +32,11 @@ export const Header: React.FC<{ className?: string }> = (props) => {
           >
             Discord
           </a>
+          <ConnectButton
+            accountStatus="address"
+            chainStatus="icon"
+            showBalance={false}
+          />
         </div>
       </div>
     </div>
